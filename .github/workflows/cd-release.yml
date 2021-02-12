@@ -7,15 +7,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Waiting for checks
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        id: wait-for-checks
+      - name: Wait on tests
+        uses: lewagon/wait-on-check-action@master
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: checks
+          check-name: checks
+          ref: ${{ github.ref }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          # wait-interval: 10
+          # running-workflow-name: 'deploy' # HERE
+
+      # - name: Wait for checks
+      #   uses: fountainhead/action-wait-for-check@v1.0.0
+      #   id: wait-for-checks
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     checkName: checks
 
       - name: Merge main -> production
-        if: steps.wait-for-build.outputs.conclusion == 'success'
         uses: devmasx/merge-branch@master
         with:
           type: now
@@ -23,12 +31,9 @@ jobs:
           target_branch: production
           github_token: ${{ github.token }}
       - name: Merge main -> demo
-        if: steps.wait-for-build.outputs.conclusion == 'success'
         uses: devmasx/merge-branch@master
         with:
           type: now
           from_branch: main
           target_branch: demo
           github_token: ${{ github.token }}
-      # - name: Do something with a failing build
-      #   if: steps.wait-for-build.outputs.conclusion == 'failure'
