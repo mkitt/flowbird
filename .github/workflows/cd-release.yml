@@ -1,0 +1,12 @@
+name: CD Release
+on:
+  release:
+    types: [published]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - run: git checkout -b production
+      - run: git rebase main
+      - run: git push origin production
