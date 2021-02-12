@@ -7,22 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Wait on tests
+      # TODO: Replace this? It works but it's pretty heavyweight
+      - name: Waiting for status checks
         uses: lewagon/wait-on-check-action@master
         with:
           check-name: checks
           ref: ${{ github.ref }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          # wait-interval: 10
-          # running-workflow-name: 'deploy' # HERE
-
-      # - name: Wait for checks
-      #   uses: fountainhead/action-wait-for-check@v1.0.0
-      #   id: wait-for-checks
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     checkName: checks
-
       - name: Merge main -> production
         uses: devmasx/merge-branch@master
         with:
@@ -37,3 +28,9 @@ jobs:
           from_branch: main
           target_branch: demo
           github_token: ${{ github.token }}
+      - name: notify success
+        if: success()
+        run: echo 'success!'
+      - name: notify failure
+        if: failure()
+        run: echo 'failure!'
