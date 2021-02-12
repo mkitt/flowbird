@@ -3,11 +3,14 @@ on:
   release:
     types: [published]
 jobs:
-  checks:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - run: git checkout main
-      - run: git checkout production
-      - run: git rebase main
-      - run: git push origin production
+      - name: Merge main -> production
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: main
+          target_branch: production
+          github_token: ${{ github.token }}
